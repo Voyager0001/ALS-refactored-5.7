@@ -33,20 +33,22 @@ namespace AlsEnsure
 #if UE_USE_LITE_ENSURES
 #define ALS_ENSURE_IMPLEMENTATION(bEnsureAlways, Expression) \
 	(LIKELY(Expression) || \
-	 (AlsEnsure::Execute(::bGEnsureHasExecuted<static_cast<uint64>(FileHashForEnsure(__FILE__)) << 32 | static_cast<uint64>(__LINE__)>, \
+	 (AlsEnsure::Execute(::bGEnsureHasExecuted<FileLineHashForEnsure(__FILE__, __LINE__)>, \
 	                    AlsEnsure::FAlsEnsureInfo{#Expression, __FILE__, __LINE__, bEnsureAlways}) && \
 	  BreakAndReturnFalse()))
 #else
 #define ALS_ENSURE_IMPLEMENTATION(bEnsureAlways, Expression) \
 	(LIKELY(Expression) || \
-	 (AlsEnsure::Execute(::bGEnsureHasExecuted<static_cast<uint64>(FileHashForEnsure(__FILE__)) << 32 | static_cast<uint64>(__LINE__)>, \
-	                    AlsEnsure::FAlsEnsureInfo{#Expression, __FILE__, __LINE__, bEnsureAlways}) && \
+	 (AlsEnsure::Execute( \
+		 ::bGEnsureHasExecuted<FileLineHashForEnsure(__FILE__, __LINE__)>, \
+		 AlsEnsure::FAlsEnsureInfo{#Expression, __FILE__, __LINE__, bEnsureAlways}) && \
 	  [] \
 	  { \
 		  PLATFORM_BREAK(); \
 		  return false; \
 	  }()))
 #endif
+
 
 #define ALS_ENSURE_IMPLEMENTATION_FORMAT(Capture, bEnsureAlways, Expression, Format, ...) \
 	(LIKELY(Expression) || [Capture]() UE_COLD UE_DEBUG_SECTION \
