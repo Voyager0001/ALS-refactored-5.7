@@ -24,19 +24,13 @@ namespace AlsEnsure
 	};
 
 	ALS_API bool UE_COLD UE_DEBUG_SECTION VARARGS
-	Execute(std::atomic<bool>& bExecuted, const FAlsEnsureInfo& EnsureInfo);
+	Execute(std::atomic<uint8>& bExecuted, const FAlsEnsureInfo& EnsureInfo);
 
 	ALS_API bool UE_COLD UE_DEBUG_SECTION VARARGS
-	ExecuteFormat(std::atomic<bool>& bExecuted, const FAlsEnsureInfo& EnsureInfo, const TCHAR* Format, ...);
+	ExecuteFormat(std::atomic<uint8>& bExecuted, const FAlsEnsureInfo& EnsureInfo, const TCHAR* Format, ...);
 }
 
-#if UE_USE_LITE_ENSURES
-#define ALS_ENSURE_IMPLEMENTATION(bEnsureAlways, Expression) \
-	(LIKELY(Expression) || \
-	 (AlsEnsure::Execute(::bGEnsureHasExecuted<FileLineHashForEnsure(__FILE__, __LINE__)>, \
-	                    AlsEnsure::FAlsEnsureInfo{#Expression, __FILE__, __LINE__, bEnsureAlways}) && \
-	  BreakAndReturnFalse()))
-#else
+
 #define ALS_ENSURE_IMPLEMENTATION(bEnsureAlways, Expression) \
 	(LIKELY(Expression) || \
 	 (AlsEnsure::Execute( \
@@ -47,14 +41,14 @@ namespace AlsEnsure
 		  PLATFORM_BREAK(); \
 		  return false; \
 	  }()))
-#endif
+
 
 
 #define ALS_ENSURE_IMPLEMENTATION_FORMAT(Capture, bEnsureAlways, Expression, Format, ...) \
 	(LIKELY(Expression) || [Capture]() UE_COLD UE_DEBUG_SECTION \
 	{ \
 		static constexpr AlsEnsure::FAlsEnsureInfo EnsureInfo{#Expression, __builtin_FILE(), __builtin_LINE(), bEnsureAlways}; \
- 		static std::atomic<bool> bExecuted{false}; \
+ 		static std::atomic<uint8> bExecuted{false}; \
  		\
 		UE_VALIDATE_FORMAT_STRING(Format, ##__VA_ARGS__); \
 		\

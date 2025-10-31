@@ -12,7 +12,7 @@
 
 namespace AlsEnsure
 {
-	static bool CanExecute(std::atomic<bool>& bExecuted, const FAlsEnsureInfo& EnsureInfo)
+	static bool CanExecute(std::atomic<uint8>& bExecuted, const FAlsEnsureInfo& EnsureInfo)
 	{
 		static const auto* EnsureAlwaysEnabledConsoleVariable{
 			IConsoleManager::Get().FindConsoleVariable(TEXT("core.EnsureAlwaysEnabled"))
@@ -76,12 +76,12 @@ namespace AlsEnsure
 #endif
 	}
 
-	bool UE_COLD UE_DEBUG_SECTION Execute(std::atomic<bool>& bExecuted, const FAlsEnsureInfo& EnsureInfo)
+	bool UE_COLD UE_DEBUG_SECTION Execute(std::atomic<uint8>& bExecuted, const FAlsEnsureInfo& EnsureInfo)
 	{
 		return CanExecute(bExecuted, EnsureInfo) && ExecuteInternal(EnsureInfo, TEXT(""));
 	}
 
-	bool UE_COLD UE_DEBUG_SECTION ExecuteFormat(std::atomic<bool>& bExecuted, const FAlsEnsureInfo& EnsureInfo,
+	bool UE_COLD UE_DEBUG_SECTION ExecuteFormat(std::atomic<uint8>& bExecuted, const FAlsEnsureInfo& EnsureInfo,
 	                                            const TCHAR* Format, ...)
 	{
 		if (!CanExecute(bExecuted, EnsureInfo))
